@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsArray, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsString, IsEnum, IsOptional } from 'class-validator';
 import { PostStatus } from './post-status.enum';
 
 export class CreatePostDto {
@@ -7,7 +7,7 @@ export class CreatePostDto {
     example: 'Example Title',
     description: 'The title of the post',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   title: string;
 
@@ -15,7 +15,7 @@ export class CreatePostDto {
     example: 'Example Content',
     description: 'The content of the post',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   content: string;
 
@@ -25,28 +25,7 @@ export class CreatePostDto {
   })
   @IsNotEmpty()
   @IsString()
-  userId: string;
-
-  @ApiProperty({
-    example: 'https://example.com/image.jpg',
-    description: 'URL or file path to an associated image',
-  })
-  @IsString()
-  image?: string;
-
-  @ApiProperty({
-    example: ['user_id1', 'user_id2'],
-    description: 'Array of user IDs who liked the post',
-  })
-  @IsArray()
-  likes: string[];
-
-  @ApiProperty({
-    example: ['comment_id1', 'comment_id2'],
-    description: 'Array of comment IDs associated with the post',
-  })
-  @IsArray()
-  comments: string[];
+  user: string;
 
   @ApiProperty({
     example: PostStatus.PUBLIC,
@@ -54,5 +33,5 @@ export class CreatePostDto {
     description: 'The status of the post (PUBLIC, PRIVATE, etc.)',
   })
   @IsEnum(PostStatus)
-  status: PostStatus;
+  status: PostStatus = PostStatus.PUBLIC;
 }

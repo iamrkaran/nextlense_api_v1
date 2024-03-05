@@ -13,22 +13,10 @@ export class Post {
   content?: string;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  userId: string; // Reference to the user who created the post
+  user: string;
 
   @Prop()
-  image?: string; // URL or file path to an associated image
-
-  @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
-    default: [],
-  })
-  likes: string[]; // Array of user IDs who liked the post
-
-  @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
-    default: [],
-  })
-  comments: string[]; // Array of comment IDs associated with the post
+  image?: string;
 
   @Prop({
     type: String,
