@@ -102,4 +102,15 @@ export class UsersController {
   ): Promise<void> {
     return this.userService.followUnfollowUser(user.email, userId);
   }
+
+  @ApiResponse({
+    type: UserInfoDto,
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Fetch user by userId' })
+  @Get('/')
+  fetchUserById(@Query('userId') userId: string): Promise<UserInfoDto> {
+    return this.userService.findUserById(userId);
+  }
 }

@@ -1,4 +1,11 @@
-import { Controller, Post, Param, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Param,
+  Get,
+  UseGuards,
+  Delete,
+} from '@nestjs/common';
 import { LikeService } from './like.service';
 
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
@@ -25,6 +32,7 @@ export class LikeController {
     status: 201,
     description: 'Like created successfully',
   })
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new like' })
   @Post('/:postId')
   createLike(
@@ -35,6 +43,23 @@ export class LikeController {
     createLikeDto.userId = user._id;
     createLikeDto.postId = postId;
     return this.likeService.createLike(createLikeDto);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'Like deleted successfully',
+  })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new like' })
+  @Delete('/:postId')
+  deleteLike(
+    @GetUser() user: User,
+    @Param('postId') postId: string,
+  ): Promise<Like> {
+    const createLikeDto = new CreateLikeDto();
+    createLikeDto.userId = user._id;
+    createLikeDto.postId = postId;
+    return this.likeService.deleteLike(createLikeDto);
   }
 
   @ApiResponse({
