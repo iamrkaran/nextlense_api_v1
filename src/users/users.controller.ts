@@ -8,11 +8,14 @@ import {
   Delete,
   UseGuards,
   Body,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -25,6 +28,7 @@ import { UserInfoDto } from './dto/user-info.dto';
 import { User } from './entities/user.entity';
 import { GetUser } from './decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('USER')
 @UseGuards(AuthGuard())
@@ -112,5 +116,33 @@ export class UsersController {
   @Get('/')
   fetchUserById(@Query('userId') userId: string): Promise<UserInfoDto> {
     return this.userService.findUserById(userId);
+  }
+
+  //update profile picture
+  @ApiResponse({
+    type: UserInfoDto,
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Update profile picture' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  @Patch('/profile-picture')
+  updateProfilePicture(
+    @GetUser() user: User,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<UserInfoDto> {
+    return this.userService.updateProfilePicture(file, user);
   }
 }

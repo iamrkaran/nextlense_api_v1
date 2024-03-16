@@ -4,6 +4,7 @@ import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
+import { AwsS3Service } from 'src/post/aws-s3.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { PassportModule } from '@nestjs/passport';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, AwsS3Service],
   exports: [UsersService],
 })
 export class UsersModule {}

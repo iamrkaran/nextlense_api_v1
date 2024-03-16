@@ -11,11 +11,13 @@ import { User, UserDocument } from './entities/user.entity';
 import { UserInfoDto } from './dto/user-info.dto';
 import { LoginDto } from '../auth/dto/login.dto';
 import mongoose, { Model } from 'mongoose';
+import { AwsS3Service } from 'src/post/aws-s3.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly awsS3Service: AwsS3Service,
   ) {}
 
   async registerUser(createUserDto: CreateUserDto): Promise<UserInfoDto> {
@@ -139,6 +141,23 @@ export class UsersService {
       throw new NotFoundException('User not found by id');
     }
     return user;
+  }
+
+  async updateProfilePicture(
+    file: Express.Multer.File,
+    user: User,
+  ): Promise<UserInfoDto> {
+    const findUser = await this.findUserByEmail(user.email);
+    const hashedUser = user._id;
+    const profilePicture = await this.awsS3Service.uploadImage(
+      file,
+      file.originalname,
+      file.mimetype,
+      hashedUser,
+    );
+    findUser.profilePicture = profilePicture;
+    await findUser.save();
+    return this.mapToUserInfo(findUser);
   }
 
   private mapToUserInfo(user: UserDocument): UserInfoDto {
