@@ -25,6 +25,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { User } from 'src/users/entities/user.entity';
+import { GetUser } from 'src/users/decorator/get-user.decorator';
 
 @ApiTags('POST')
 @UseGuards(JwtAuthGuard)
@@ -72,9 +74,6 @@ export class PostController {
     schema: {
       type: 'object',
       properties: {
-        user: {
-          type: 'string',
-        },
         title: {
           type: 'string',
         },
@@ -90,10 +89,15 @@ export class PostController {
   })
   @UseInterceptors(FileInterceptor('file'))
   async createPost(
+    @GetUser() user: User,
     @UploadedFile() file: Express.Multer.File,
     @Body(new ValidationPipe()) createPostDto: CreatePostDto,
   ) {
-    const newPost = await this.postService.createPost(createPostDto, file);
+    const newPost = await this.postService.createPost(
+      createPostDto,
+      file,
+      user._id,
+    );
     return newPost;
   }
 
@@ -121,4 +125,5 @@ export class PostController {
   deletePost(@Param('postId') postId: string): Promise<CreatePostDto> {
     return this.postService.deletePost(postId);
   }
+  //fetch posts by username
 }

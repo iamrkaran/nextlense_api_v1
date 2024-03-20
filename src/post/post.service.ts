@@ -33,9 +33,10 @@ export class PostService {
   async createPost(
     createPostDto: CreatePostDto,
     file: Express.Multer.File,
+    userId: string,
   ): Promise<any> {
     try {
-      const hashedUser = createPostDto.user;
+      const hashedUser = userId.replace(/[^a-zA-Z0-9]/g, '');
       const imageUrl = await this.awsS3Service.uploadImage(
         file,
         file.originalname,
@@ -43,10 +44,10 @@ export class PostService {
         hashedUser,
       );
 
-      const { user, title, content } = createPostDto;
+      const { title, content } = createPostDto;
 
       const newPost = new this.postModel({
-        user,
+        user: userId,
         title,
         content,
         image: imageUrl,
