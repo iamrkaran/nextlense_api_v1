@@ -145,4 +145,18 @@ export class UsersController {
   ): Promise<UserInfoDto> {
     return this.userService.updateProfilePicture(file, user);
   }
+
+  //fetch profile by username
+  @ApiResponse({
+    type: UserInfoDto,
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Fetch user by username' })
+  @Get('/username')
+  fetchUserByUsername(
+    @Query('username') username: string,
+  ): Promise<UserInfoDto> {
+    return this.userService.fetchUserByUsername(username);
+  }
 }

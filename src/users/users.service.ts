@@ -160,6 +160,14 @@ export class UsersService {
     return this.mapToUserInfo(findUser);
   }
 
+  async fetchUserByUsername(username: string): Promise<UserInfoDto> {
+    const user = await this.userModel.findOne({ username });
+    if (!user) {
+      throw new NotFoundException('User not found by username');
+    }
+    return this.mapToUserInfo(user);
+  }
+
   private mapToUserInfo(user: UserDocument): UserInfoDto {
     return {
       _id: user._id,

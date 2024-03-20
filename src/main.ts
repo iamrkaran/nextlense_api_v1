@@ -20,6 +20,7 @@ async function bootstrap() {
       persistAuthorization: true,
     },
   };
+  app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
     .setTitle('Swagger API')
     .setDescription('Swagger API Document')
