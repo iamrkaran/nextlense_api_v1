@@ -1,7 +1,9 @@
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -9,11 +11,14 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post, PostDocument } from './entities/post.entity';
 import { AwsS3Service } from './aws-s3.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
     private readonly awsS3Service: AwsS3Service,
   ) {}
 
@@ -80,6 +85,30 @@ export class PostService {
       throw new NotFoundException('Post not found');
     }
     return this.mapToPostInfo(post);
+  }
+
+  async getAllPostsByUsername(username: string): Promise<CreatePostDto[]> {
+    //get username from userservice
+    const user = await this.usersService.fetchUserByUsername(username);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const posts = await this.postModel.find({ user: user._id }).exec();
+    return posts.map((post) => this.mapToPostInfo(post));
+  }
+
+  // fetchSavedPostsByUsername
+  async fetchSavedPostsByUsername(username: string): Promise<CreatePostDto[]> {
+    //savedposts[] in usermodel relation with postId, it have postId[]
+    const user = await this.usersService.fetchUserByUsername(username);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const posts = await this.postModel
+      .find({ _id: { $in: user.savedPosts } })
+      .exec();
+
+    return posts.map((post) => this.mapToPostInfo(post));
   }
 
   private mapToPostInfo(post: PostDocument): CreatePostDto {

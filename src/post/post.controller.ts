@@ -126,4 +126,31 @@ export class PostController {
     return this.postService.deletePost(postId);
   }
   //fetch posts by username
+
+  @ApiResponse({
+    type: CreatePostDto,
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Get all posts by username' })
+  @Get('/user/:username')
+  getAllPostsByUsername(
+    @Param('username') username: string,
+  ): Promise<CreatePostDto[]> {
+    return this.postService.getAllPostsByUsername(username);
+  }
+
+  // fetchSavedPostsByUsername
+  @ApiResponse({
+    type: CreatePostDto,
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Get all saved posts by username' })
+  @Get('/saved/user/:username')
+  getAllSavedPostsByUsername(
+    @Param('username') username: string,
+  ): Promise<CreatePostDto[]> {
+    return this.postService.fetchSavedPostsByUsername(username);
+  }
 }
