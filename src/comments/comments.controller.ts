@@ -65,7 +65,7 @@ export class CommentsController {
   findCommentById(
     @Param('commentId') commentId: string,
   ): Promise<CommentDocument> {
-    return this.commentService.findOne(commentId);
+    return this.commentService.findCommentById(commentId);
   }
 
   @ApiResponse({

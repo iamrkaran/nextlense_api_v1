@@ -10,5 +10,6 @@ import { Comment, CommentSchema } from './entities/comment.entity';
   ],
   controllers: [CommentsController],
   providers: [CommentsService],
+  exports: [CommentsService],
 })
 export class CommentsModule {}

@@ -11,5 +11,6 @@ import { Like, LikeSchema } from './entities/like.entity';
 
   controllers: [LikeController],
   providers: [LikeService],
+  exports: [LikeService],
 })
 export class LikeModule {}

@@ -23,8 +23,14 @@ export class CommentsService {
     return this.commentModel.find().exec();
   }
 
-  async findOne(id: string): Promise<CommentDocument> {
-    return this.commentModel.findById(id);
+  //fetch comments by post id
+  async fetchComments(postId: string): Promise<CommentDocument[]> {
+    return this.commentModel.find({ postId }).exec();
+  }
+  // const comments = await this.commentsService.fetchComments(post._id.toString());
+
+  async findCommentById(id: string): Promise<CommentDocument> {
+    return this.commentModel.findById(id).exec();
   }
 
   async updateComment(

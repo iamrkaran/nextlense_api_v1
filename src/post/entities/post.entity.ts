@@ -7,19 +7,22 @@ export type PostDocument = Post & Document;
 @Schema({ timestamps: true })
 export class Post {
   @Prop({ required: true })
-  title?: string;
-
-  @Prop({ required: true })
-  content?: string;
+  caption?: string;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  user: string;
+  userId: string;
 
   @Prop()
   image?: string;
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Like' }] })
   likes: string[];
+
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Comment' }] })
+  comments: string[];
+
+  @Prop()
+  location?: string;
 
   @Prop({
     type: String,

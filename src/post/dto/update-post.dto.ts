@@ -1,18 +1,10 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreatePostDto } from './create-post.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsArray, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsNotEmpty } from 'class-validator';
 import { PostStatus } from './post-status.enum';
 
 export class UpdatePostDto extends PartialType(CreatePostDto) {
-  @ApiPropertyOptional({
-    example: 'Updated Title',
-    description: 'The updated title of the post',
-  })
-  @IsOptional()
-  @IsString()
-  title?: string;
-
   @ApiPropertyOptional({
     example: 'Updated Content',
     description: 'The updated content of the post',
@@ -20,6 +12,14 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {
   @IsOptional()
   @IsString()
   content?: string;
+
+  @ApiPropertyOptional({
+    example: 'user_id',
+    description: 'Reference to the user who created the post',
+  })
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
 
   @ApiPropertyOptional({
     example: 'https://example.com/updated-image.jpg',
@@ -30,20 +30,12 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {
   image?: string;
 
   @ApiPropertyOptional({
-    example: ['user_id3', 'user_id4'],
-    description: 'Updated array of user IDs who liked the post',
+    example: 'Lucknow India',
+    description: 'The location of the post',
   })
   @IsOptional()
-  @IsArray()
-  likes?: string[];
-
-  @ApiPropertyOptional({
-    example: ['comment_id3', 'comment_id4'],
-    description: 'Updated array of comment IDs associated with the post',
-  })
-  @IsOptional()
-  @IsArray()
-  comments?: string[];
+  @IsString()
+  location?: string;
 
   @ApiPropertyOptional({
     example: PostStatus.PRIVATE,

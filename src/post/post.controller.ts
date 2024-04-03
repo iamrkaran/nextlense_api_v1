@@ -27,33 +27,34 @@ import {
 } from '@nestjs/swagger';
 import { User } from 'src/users/entities/user.entity';
 import { GetUser } from 'src/users/decorator/get-user.decorator';
+import { PostResponseDto } from './dto/post-response.dto';
 
-@ApiTags('POST')
+@ApiTags('POSTS')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('Secret1234')
-@Controller('post')
+@Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @ApiResponse({
-    type: CreatePostDto,
+    type: PostResponseDto,
     status: 200,
     description: 'Success',
   })
   @ApiOperation({ summary: 'Get all posts' })
   @Get('/')
-  getAllPosts(): Promise<CreatePostDto[]> {
+  getAllPosts(): Promise<PostResponseDto[]> {
     return this.postService.getAllPosts();
   }
 
   @ApiResponse({
-    type: CreatePostDto,
+    type: PostResponseDto,
     status: 200,
     description: 'Success',
   })
   @ApiOperation({ summary: 'Get post by ID' })
   @Get('/:postId')
-  getPostById(@Param('postId') postId: string): Promise<CreatePostDto> {
+  getPostById(@Param('postId') postId: string): Promise<PostResponseDto> {
     return this.postService.getPostById(postId);
   }
 
@@ -74,10 +75,10 @@ export class PostController {
     schema: {
       type: 'object',
       properties: {
-        title: {
+        caption: {
           type: 'string',
         },
-        content: {
+        location: {
           type: 'string',
         },
         file: {
@@ -102,7 +103,7 @@ export class PostController {
   }
 
   @ApiResponse({
-    type: CreatePostDto, // Replace with your actual response DTO
+    type: CreatePostDto,
     status: 200,
     description: 'Post updated successfully',
   })
@@ -138,6 +139,36 @@ export class PostController {
     @Param('username') username: string,
   ): Promise<CreatePostDto[]> {
     return this.postService.getAllPostsByUsername(username);
+  }
+
+  // save post
+  @ApiResponse({
+    type: CreatePostDto,
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Save a post' })
+  @Patch('/save/:postId')
+  savePost(
+    @Param('postId') postId: string,
+    @GetUser() user: User,
+  ): Promise<CreatePostDto> {
+    return this.postService.savePost(postId, user);
+  }
+
+  // unsave post
+  @ApiResponse({
+    type: CreatePostDto,
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Unsave a post' })
+  @Delete('/save/:postId')
+  unsavePost(
+    @Param('postId') postId: string,
+    @GetUser() user: User,
+  ): Promise<CreatePostDto> {
+    return this.postService.unsavePost(postId, user);
   }
 
   // fetchSavedPostsByUsername

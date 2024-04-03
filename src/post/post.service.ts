@@ -12,6 +12,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post, PostDocument } from './entities/post.entity';
 import { AwsS3Service } from './aws-s3.service';
 import { UsersService } from 'src/users/users.service';
+import { LikeService } from 'src/like/like.service';
+import { CommentsService } from 'src/comments/comments.service';
+import { PostResponseDto } from './dto/post-response.dto';
 
 @Injectable()
 export class PostService {
@@ -20,19 +23,69 @@ export class PostService {
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly awsS3Service: AwsS3Service,
+    private readonly likeService: LikeService,
+    private readonly commentsService: CommentsService,
   ) {}
 
-  async getAllPosts(): Promise<CreatePostDto[]> {
+  async getAllPosts(): Promise<PostResponseDto[]> {
     const posts = await this.postModel.find().exec();
-    return posts.map((post) => this.mapToPostInfo(post));
+
+    // Map over each post
+    const postsWithLikesAndComments = await Promise.all(
+      posts.map(async (post) => {
+        // Find likes and comments associated with the post
+        const likes = await this.likeService.getLikesByPostId(
+          post._id.toString(),
+        );
+        const comments = await this.commentsService.fetchComments(
+          post._id.toString(),
+        );
+
+        // Map the post to a PostInfo object and add the likes and comments
+        const postInfo = this.mapToPostInfo(post);
+        postInfo.likes = likes; // Add likes to the post
+        postInfo.comments = comments.map((comment) => ({
+          _id: comment._id,
+          userId: comment.userId,
+          postId: comment.postId,
+          content: comment.content,
+          createdAt: comment.createdAt,
+        }));
+        // console.log('postInfo:', postInfo);
+
+        return postInfo;
+      }),
+    );
+
+    return postsWithLikesAndComments;
   }
 
-  async getPostById(postId: string): Promise<CreatePostDto> {
+  async getPostById(postId: string): Promise<PostResponseDto> {
     const post = await this.postModel.findById(postId).exec();
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-    return this.mapToPostInfo(post);
+
+    // Find likes and comments associated with the post
+    const likes = await this.likeService.getLikesByPostId(post._id.toString());
+    const comments = await this.commentsService.fetchComments(
+      post._id.toString(),
+    );
+
+    // Map the post to a PostInfo object and add the likes and comments
+    const postInfo = this.mapToPostInfo(post);
+    postInfo.likes = likes; // Add likes to the post
+    postInfo.comments = comments.map((comment) => ({
+      _id: comment._id,
+      userId: comment.userId,
+      postId: comment.postId,
+      content: comment.content,
+      createdAt: comment.createdAt,
+    }));
+
+    console.log('postInfo:', postInfo);
+
+    return postInfo;
   }
 
   async createPost(
@@ -49,12 +102,12 @@ export class PostService {
         hashedUser,
       );
 
-      const { title, content } = createPostDto;
+      const { caption, location } = createPostDto;
 
       const newPost = new this.postModel({
-        user: userId,
-        title,
-        content,
+        userId,
+        caption,
+        location,
         image: imageUrl,
       });
       await newPost.save();
@@ -93,7 +146,7 @@ export class PostService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const posts = await this.postModel.find({ user: user._id }).exec();
+    const posts = await this.postModel.find({ userId: user._id }).exec();
     return posts.map((post) => this.mapToPostInfo(post));
   }
 
@@ -109,6 +162,44 @@ export class PostService {
       .exec();
 
     return posts.map((post) => this.mapToPostInfo(post));
+  }
+
+  async savePost(postId: string, user: any): Promise<CreatePostDto> {
+    const post = await this.postModel.findById(postId).exec();
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    //check if post already saved by user
+    const isSaved = user.savedPosts.includes(postId);
+    if (isSaved) {
+      throw new NotFoundException('Post already saved');
+    }
+
+    //save post in user model
+    user.savedPosts.push(postId);
+    await user.save();
+
+    return this.mapToPostInfo(post);
+  }
+
+  async unsavePost(postId: string, user: any): Promise<CreatePostDto> {
+    const post = await this.postModel.findById(postId).exec();
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    //check if post already saved by user
+    const isSaved = user.savedPosts.includes(postId);
+    if (!isSaved) {
+      throw new NotFoundException('Post not saved');
+    }
+
+    //remove post from user model
+    user.savedPosts = user.savedPosts.filter((id) => id !== postId);
+    await user.save();
+
+    return this.mapToPostInfo(post);
   }
 
   private mapToPostInfo(post: PostDocument): CreatePostDto {

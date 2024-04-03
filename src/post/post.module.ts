@@ -6,12 +6,16 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Post, PostSchema } from './entities/post.entity';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
+import { CommentsModule } from 'src/comments/comments.module';
+import { LikeModule } from 'src/like/like.module';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     forwardRef(() => UsersModule),
+    forwardRef(() => LikeModule),
+    forwardRef(() => CommentsModule),
   ],
   controllers: [PostController],
   providers: [PostService, AwsS3Service],
