@@ -16,10 +16,10 @@ export class Post {
   image?: string;
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Like' }] })
-  likes: string[];
+  likes?: string[];
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Comment' }] })
-  comments: string[];
+  comments?: string[];
 
   @Prop()
   location?: string;

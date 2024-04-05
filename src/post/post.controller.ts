@@ -28,13 +28,17 @@ import {
 import { User } from 'src/users/entities/user.entity';
 import { GetUser } from 'src/users/decorator/get-user.decorator';
 import { PostResponseDto } from './dto/post-response.dto';
+import { PostsRecommendationService } from './posts.recommendation.service';
 
 @ApiTags('POSTS')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('Secret1234')
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly postsRecommendationService: PostsRecommendationService,
+  ) {}
 
   @ApiResponse({
     type: PostResponseDto,
@@ -45,6 +49,18 @@ export class PostController {
   @Get('/')
   getAllPosts(): Promise<PostResponseDto[]> {
     return this.postService.getAllPosts();
+  }
+
+  // get post recommendations
+  @ApiResponse({
+    type: PostResponseDto,
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Get post recommendations for a user' })
+  @Get('/recommendations')
+  getPostsRecommendations(@GetUser() user: User): Promise<PostResponseDto[]> {
+    return this.postsRecommendationService.getPostsRecommendations(user._id);
   }
 
   @ApiResponse({

@@ -83,7 +83,7 @@ export class PostService {
       createdAt: comment.createdAt,
     }));
 
-    console.log('postInfo:', postInfo);
+    // console.log('postInfo:', postInfo);
 
     return postInfo;
   }
@@ -200,6 +200,18 @@ export class PostService {
     await user.save();
 
     return this.mapToPostInfo(post);
+  }
+
+  async getPostsByUsers(userIds: string[]): Promise<PostDocument[]> {
+    return this.postModel.find({ userId: { $in: userIds } }).exec();
+  }
+
+  async getSimilarPosts(post: PostResponseDto): Promise<PostDocument[]> {
+    return this.postModel
+      .find({
+        $or: [{ caption: post.caption }, { location: post.location }],
+      })
+      .exec();
   }
 
   private mapToPostInfo(post: PostDocument): CreatePostDto {

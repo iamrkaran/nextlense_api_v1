@@ -132,11 +132,11 @@ export class CreateUserDto {
   @IsBoolean()
   isOAuthUser: boolean;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     example: 'password123',
     description: 'The password of the user',
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  password?: string;
+  password: string;
 }

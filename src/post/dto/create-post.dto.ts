@@ -17,9 +17,8 @@ export class CreatePostDto {
     example: 'user_id',
     description: 'Reference to the user who created the post',
   })
-  @IsOptional()
   @IsString()
-  userId?: string;
+  userId: string;
 
   @ApiProperty({
     example: 'Lucknow India',

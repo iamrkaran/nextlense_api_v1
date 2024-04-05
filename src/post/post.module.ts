@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
 import { CommentsModule } from 'src/comments/comments.module';
 import { LikeModule } from 'src/like/like.module';
+import { PostsRecommendationService } from './posts.recommendation.service';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { LikeModule } from 'src/like/like.module';
     forwardRef(() => CommentsModule),
   ],
   controllers: [PostController],
-  providers: [PostService, AwsS3Service],
-  exports: [PostService],
+  providers: [PostService, AwsS3Service, PostsRecommendationService],
+  exports: [PostService, PostsRecommendationService],
 })
 export class PostModule {}
