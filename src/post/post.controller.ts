@@ -101,6 +101,11 @@ export class PostController {
           type: 'string',
           format: 'binary',
         },
+        status: {
+          type: 'string',
+          enum: ['PUBLIC', 'PRIVATE'],
+          default: 'PUBLIC',
+        },
       },
     },
   })

@@ -14,13 +14,6 @@ export class CreatePostDto {
   caption?: string;
 
   @ApiProperty({
-    example: 'user_id',
-    description: 'Reference to the user who created the post',
-  })
-  @IsString()
-  userId: string;
-
-  @ApiProperty({
     example: 'Lucknow India',
     description: 'The location of the post',
   })

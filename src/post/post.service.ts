@@ -51,7 +51,6 @@ export class PostService {
           content: comment.content,
           createdAt: comment.createdAt,
         }));
-        // console.log('postInfo:', postInfo);
 
         return postInfo;
       }),
@@ -214,7 +213,7 @@ export class PostService {
       .exec();
   }
 
-  private mapToPostInfo(post: PostDocument): CreatePostDto {
-    return post.toObject() as CreatePostDto;
+  private mapToPostInfo(post: PostDocument): PostResponseDto {
+    return post.toObject() as PostResponseDto;
   }
 }
