@@ -163,39 +163,42 @@ export class PostService {
     return posts.map((post) => this.mapToPostInfo(post));
   }
 
-  async savePost(postId: string, user: any): Promise<CreatePostDto> {
+  async bookmarkPost(postId: string, user: any): Promise<CreatePostDto> {
     const post = await this.postModel.findById(postId).exec();
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    //check if post already saved by user
-    const isSaved = user.savedPosts.includes(postId);
-    if (isSaved) {
-      throw new NotFoundException('Post already saved');
+    // Check if post already bookmarked by user
+    const isBookmarked = user.savedPosts.includes(postId);
+    if (isBookmarked) {
+      throw new NotFoundException('Post already bookmarked');
     }
 
-    //save post in user model
+    // Bookmark post in user model
     user.savedPosts.push(postId);
     await user.save();
 
     return this.mapToPostInfo(post);
   }
 
-  async unsavePost(postId: string, user: any): Promise<CreatePostDto> {
+  async removeBookmarkFromPost(
+    postId: string,
+    user: any,
+  ): Promise<CreatePostDto> {
     const post = await this.postModel.findById(postId).exec();
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    //check if post already saved by user
-    const isSaved = user.savedPosts.includes(postId);
-    if (!isSaved) {
-      throw new NotFoundException('Post not saved');
+    // Check if post is not bookmarked by user
+    const isBookmarked = user.savedPosts.includes(postId);
+    if (!isBookmarked) {
+      throw new NotFoundException('Post not bookmarked');
     }
 
-    //remove post from user model
-    user.savedPosts = user.savedPosts.filter((id) => id !== postId);
+    // Remove bookmark from post in user model
+    user.savedPosts = user.savedPosts.filter((id: string) => id !== postId);
     await user.save();
 
     return this.mapToPostInfo(post);

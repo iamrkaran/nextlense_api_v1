@@ -161,48 +161,4 @@ export class PostController {
   ): Promise<CreatePostDto[]> {
     return this.postService.getAllPostsByUsername(username);
   }
-
-  // save post
-  @ApiResponse({
-    type: CreatePostDto,
-    status: 200,
-    description: 'Success',
-  })
-  @ApiOperation({ summary: 'Save a post' })
-  @Patch('/save/:postId')
-  savePost(
-    @Param('postId') postId: string,
-    @GetUser() user: User,
-  ): Promise<CreatePostDto> {
-    return this.postService.savePost(postId, user);
-  }
-
-  // unsave post
-  @ApiResponse({
-    type: CreatePostDto,
-    status: 200,
-    description: 'Success',
-  })
-  @ApiOperation({ summary: 'Unsave a post' })
-  @Delete('/save/:postId')
-  unsavePost(
-    @Param('postId') postId: string,
-    @GetUser() user: User,
-  ): Promise<CreatePostDto> {
-    return this.postService.unsavePost(postId, user);
-  }
-
-  // fetchSavedPostsByUsername
-  @ApiResponse({
-    type: CreatePostDto,
-    status: 200,
-    description: 'Success',
-  })
-  @ApiOperation({ summary: 'Get all saved posts by username' })
-  @Get('/saved/user/:username')
-  getAllSavedPostsByUsername(
-    @Param('username') username: string,
-  ): Promise<CreatePostDto[]> {
-    return this.postService.fetchSavedPostsByUsername(username);
-  }
 }
