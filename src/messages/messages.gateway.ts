@@ -10,6 +10,7 @@ import { CreateMessageDto } from './dto/create-message.dto';
 
 @WebSocketGateway({ cors: true })
 export class MessagesGateway {
+  
   @WebSocketServer() server: Server;
   constructor(private readonly messagesService: MessagesService) {}
 
