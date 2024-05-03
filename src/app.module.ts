@@ -8,7 +8,6 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LikeModule } from './like/like.module';
 import { CommentsModule } from './comments/comments.module';
-import { MessagesModule } from './messages/messages.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
 
 @Module({
@@ -25,7 +24,6 @@ import { BookmarkModule } from './bookmark/bookmark.module';
     ConfigModule,
     LikeModule,
     CommentsModule,
-    MessagesModule,
     BookmarkModule,
   ],
   controllers: [AppController],
