@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { LikeModule } from './like/like.module';
 import { CommentsModule } from './comments/comments.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { BookmarkModule } from './bookmark/bookmark.module';
     LikeModule,
     CommentsModule,
     BookmarkModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
