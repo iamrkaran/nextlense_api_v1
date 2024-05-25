@@ -33,7 +33,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/api/v1', app, document, swaggerCustomOptions);
 
-  await app.listen(3000);
-  Logger.log(`Application running on http://localhost:${3000}`);
+  await app.listen(5000);
+  Logger.log(`Application running on http://localhost:${5000}`);
 }
 bootstrap();
