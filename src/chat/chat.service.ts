@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Message, MessageDocument } from './entities/message.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chat, ChatDocument } from './entities/chat.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import * as Pusher from 'pusher';
 
 import { UsersService } from 'src/users/users.service';
@@ -33,7 +33,16 @@ export class ChatService {
         });
       } else {
         // Add the new message to the existing chat
-        chat.messages.push({ message, senderId, createdAt: new Date() });
+        const newObjectId = new Types.ObjectId();
+        // const _id = new ObjectId().toString();
+        console.log('newObjectId', newObjectId);
+        chat.messages.push({
+          _id: newObjectId,
+          message,
+          senderId,
+          createdAt: new Date(),
+        });
+        console.log(chat.messages);
         await chat.save();
       }
       // Initialize Pusher with your credentials
@@ -44,11 +53,17 @@ export class ChatService {
         cluster: 'ap2',
       });
 
-      // Trigger a Pusher event for each member to notify about the new chat/message
+      // Trigger a Pusher event for each member to notify about the new message
+      // Function to trigger a new messag
+
       chat.members.forEach(async (member) => {
-        await pusher.trigger(member.toString(), 'new-chat', chat);
+        await pusher.trigger(member.toString(), 'new-message', {
+          message,
+          senderId,
+        });
       });
-      return chat._id.toString(); // Return the chat ID
+
+      return chat;
     } catch (error) {
       console.error('Error creating chat:', error);
       throw new Error('Chat creation failed');
@@ -65,4 +80,46 @@ export class ChatService {
       throw new Error('Chat not found');
     }
   }
+
+  async remove(id: string): Promise<Chat> {
+    const chat = await this.chatModel.findById(id);
+    if (!chat) {
+      throw new NotFoundException(`Chat with id ${id} not found`);
+    }
+    return this.chatModel.findByIdAndDelete(id);
+  }
+
+  async removeMessage(chatId: string, messageId: string): Promise<Message> {
+    const chat = await this.chatModel.findById(chatId);
+    if (!chat) {
+      throw new NotFoundException(`Chat with id ${chatId} not found`);
+    }
+    // console.log('chat', chat.messages);
+    const message = chat.messages.find((message) =>
+      message?._id.equals(messageId),
+    );
+
+    if (!message) {
+      throw new NotFoundException(`Message with id ${messageId} not found`);
+    } else {
+      chat.messages = chat.messages.filter((msg) => !msg._id.equals(messageId));
+      await chat.save();
+
+      // Initialize Pusher with your credentials
+      const pusher = new Pusher({
+        appId: process.env.PUSHER_APP_ID || '1794714',
+        key: process.env.PUSHER_APP_KEY || '0318fca772f7c1aed7aa',
+        secret: process.env.PUSHER_SECRET || 'ff2148157e43baf16970',
+        cluster: 'ap2',
+      });
+
+      // Trigger a Pusher event for each member to notify about the deleted message
+      chat.members.forEach(async (member) => {
+        await pusher.trigger(member.toString(), 'delete-message', message);
+      });
+
+      return message;
+    }
+  }
+  kd;
 }
