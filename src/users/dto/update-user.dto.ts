@@ -134,6 +134,14 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   isOAuthUser: boolean;
 
   @ApiPropertyOptional({
+    example: 'en',
+    description: 'The language of the user',
+  })
+  @IsOptional()
+  @IsString()
+  captionLanguage?: string;
+
+  @ApiPropertyOptional({
     example: 'password123',
     description: 'The password of the user',
   })

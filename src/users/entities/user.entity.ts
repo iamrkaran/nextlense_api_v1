@@ -61,6 +61,10 @@ export class User {
   @Prop({ default: false })
   isOAuthUser: boolean;
 
+  //captionLanguage
+  @Prop()
+  captionLanguage?: string;
+
   @Prop({
     type: String,
     required: function () {

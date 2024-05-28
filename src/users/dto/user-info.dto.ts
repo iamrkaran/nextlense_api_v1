@@ -53,6 +53,9 @@ export class UserInfoDto {
   @ApiProperty()
   readonly isOAuthUser: boolean;
 
+  @ApiProperty()
+  readonly captionLanguage?: string;
+
   constructor({
     _id,
     username,
@@ -71,6 +74,7 @@ export class UserInfoDto {
     isOnBoardingComplete,
     isVerified,
     isOAuthUser,
+    captionLanguage,
   }: User) {
     this._id = _id;
     this.username = username;
@@ -89,5 +93,6 @@ export class UserInfoDto {
     this.isOnBoardingComplete = isOnBoardingComplete;
     this.isVerified = isVerified;
     this.isOAuthUser = isOAuthUser;
+    this.captionLanguage = captionLanguage;
   }
 }

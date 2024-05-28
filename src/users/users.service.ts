@@ -187,6 +187,7 @@ export class UsersService {
       isOnBoardingComplete: user.isOnBoardingComplete,
       isVerified: user.isVerified,
       isOAuthUser: user.isOAuthUser,
+      captionLanguage: user.captionLanguage,
     };
   }
 }
